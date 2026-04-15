@@ -13,16 +13,12 @@ from datetime import datetime
 # 0. DATA FETCHING (RATE-LIMIT PROTECTION)
 # ==============================================================================
 # This section ensures we don't get banned by Yahoo Finance
-@st.cache_data(ttl=120)  # Caches data for 2 minutes
+@st.cache_data(ttl=120)  # Keeps caching active to prevent spam
 def get_quantum_data(pair, timeframe):
     try:
-        # Create a session to mimic a browser
-        session = requests.Session()
-        session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
-        
-        ticker = yf.Ticker(pair, session=session)
+        # We stop passing a custom 'session' here
+        # yfinance will now use its own internal logic
+        ticker = yf.Ticker(pair)
         data = ticker.history(period="2d", interval=timeframe)
         
         if data.empty:
